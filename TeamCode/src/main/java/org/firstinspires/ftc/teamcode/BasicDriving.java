@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -104,12 +101,26 @@ public class BasicDriving extends OpMode
      */
     @Override
     public void loop() {
-        double leftPower = -0.5* gamepad1.left_stick_y;
-        double rightPower = -0.5* gamepad1.right_stick_y;
-        rightFront.setPower(rightPower);
-        leftFront.setPower(leftPower);
-        rightBack.setPower(rightPower);
-        leftBack.setPower(leftPower);
+       // here was my original implementation.it was very limited.
+        // double leftPower = -0.5* gamepad1.left_stick_y;
+        // double rightPower = -0.5* gamepad1.right_stick_y;
+        // rightFront.setPower(rightPower);
+        // leftFront.setPower(leftPower);
+        // rightBack.setPower(rightPower);
+        // leftBack.setPower(leftPower);
+
+       // double y = -0.5* gamepad1.left_stick_y;
+      //  double x = gamepad1.right_stick_x;
+
+        double y = -gamepad1.left_stick_y; // Remember, this is reversed!
+        double x = gamepad1.left_stick_x;
+        double rx = gamepad1.right_stick_x;
+
+        leftFront.setPower(y + x + rx);
+        leftBack.setPower(y - x + rx);
+        rightFront.setPower(y - x - rx);
+        rightBack.setPower(y + x - rx);
+
     }
 
     /*
