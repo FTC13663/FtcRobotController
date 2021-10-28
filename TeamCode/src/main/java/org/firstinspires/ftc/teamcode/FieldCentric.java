@@ -120,6 +120,19 @@ public class FieldCentric extends OpMode
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
+        double orientation = Math.toRadian(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        double sin = Math.sin(orientation);
+        double cos = Math.cosine(orientation);
+        // forward = y
+        // strafe = x
+        // clockwise = rx
+
+        double temp = y * cos - x * sin;
+        x = y * sin + x * cos;
+        y = temp;
+
+
+        
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         leftFront.setPower ((y + x + rx) / denominator);
         leftBack.setPower ((y - x + rx) / denominator);
