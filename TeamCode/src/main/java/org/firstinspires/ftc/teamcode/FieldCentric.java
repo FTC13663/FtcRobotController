@@ -82,7 +82,6 @@ public class FieldCentric extends OpMode
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.mode = BNO055IMU.SensorMode.GYRONLY;
 
         this.imu.initialize(parameters);
 
@@ -120,9 +119,9 @@ public class FieldCentric extends OpMode
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
 
-        double orientation = Math.toRadian(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        double orientation = Math.toRadians(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
         double sin = Math.sin(orientation);
-        double cos = Math.cosine(orientation);
+        double cos = Math.cos(orientation);
         // forward = y
         // strafe = x
         // clockwise = rx
@@ -138,6 +137,8 @@ public class FieldCentric extends OpMode
         leftBack.setPower ((y - x + rx) / denominator);
         rightFront.setPower ((y - x - rx) / denominator);
         rightBack.setPower ((y + x - rx) / denominator);
+
+        telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
     }
 
     /*
