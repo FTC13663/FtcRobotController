@@ -48,7 +48,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
         private DcMotor rightFront = null;
         private DcMotor rightBack = null;
         private DcMotor spinning;
-        //private BNO055IMU imu;
+        private BNO055IMU imu;
 
         /*/
          * Code to run ONCE when the driver hits INIT\\\\\\
@@ -63,13 +63,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
             rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
             rightBack = hardwareMap.get(DcMotor.class, "rightBack");
             spinning = hardwareMap.get(DcMotor.class, "spinning");
-            //imu = hardwareMap.get(BNO055IMU.class, "imu");
+            imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-            //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-            //parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-            //parameters.mode = BNO055IMU.SensorMode.GYRONLY;
+            BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+            parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+            parameters.mode = BNO055IMU.SensorMode.GYRONLY;
 
-            //this.imu.initialize(parameters);
+            this.imu.initialize(parameters);
 
 
             // we have 4 motors to rotate each mecanum wheel
