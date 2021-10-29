@@ -62,6 +62,7 @@ public class FieldCentric extends OpMode
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
+    // private DcMotor spinning = null;
     private BNO055IMU imu;
 
     /*/
@@ -71,14 +72,13 @@ public class FieldCentric extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
+        // set up the motors
         leftFront  = hardwareMap.get(DcMotor.class, "leftFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+        // spinning = hardwareMap.get(DcMotor.class, "spinning");
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -96,25 +96,18 @@ public class FieldCentric extends OpMode
         telemetry.addData("Status", "Initialized");
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
     @Override
     public void init_loop() {
+        // gets data for robot orientation
         telemetry.addData("imu heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
     }
 
-    /*
-     * Code to run ONCE when the driver hits PLAY
-     */
     @Override
     public void start() { }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
-     */
     @Override
     public void loop() {
+        // defining the power
         double y = -gamepad1.left_stick_y; // Remember, this is reversed!
         double x = gamepad1.left_stick_x;
         double rx = gamepad1.right_stick_x;
@@ -124,7 +117,7 @@ public class FieldCentric extends OpMode
         double cos = Math.cos(orientation);
         // forward = y
         // strafe = x
-        // clockwise = rx
+        // clockwise rotation = rx
 
         double temp = y * cos - x * sin;
         x = y * sin + x * cos;
@@ -133,13 +126,26 @@ public class FieldCentric extends OpMode
 
         
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+        // this denominator scales the values outside of range [1,-1]
         leftFront.setPower ((y + x + rx) / denominator);
         leftBack.setPower ((y - x + rx) / denominator);
         rightFront.setPower ((y - x - rx) / denominator);
         rightBack.setPower ((y + x - rx) / denominator);
 
         telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+
+        // the driver will use gamepad 1 to control spinning
+        // because they're the ones who have to align it anyway
+        // gamepad 1
+        /* if (gamepad1.a) {
+             spinning.setPower(0.7);
+        } else if (gamepad1.b) {
+            spinning.setPower(-0.7);
+        } else {
+            spinning.setPower(0)
+        } */
     }
+
 
     /*
      * Code to run ONCE after the driver hits STOP

@@ -48,7 +48,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Robot Centric Driving", group="Iterative Opmode")
+@TeleOp(name="RobotCentric", group="Iterative Opmode")
 // @Disabled
 public class RobotCentric extends OpMode
 {
@@ -57,6 +57,7 @@ public class RobotCentric extends OpMode
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
+    private DcMotor spinning = null;
 
     /*/
      * Code to run ONCE when the driver hits INIT
@@ -72,12 +73,14 @@ public class RobotCentric extends OpMode
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+        spinning = hardwareMap.get(DcMotor.class, "spinning");
 
         // we have 4 motors to rotate each mecanum wheel
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
+        spinning.setDirection(DcMotor.Direction.FORWARD);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -110,6 +113,18 @@ public class RobotCentric extends OpMode
         leftBack.setPower ((y - x + rx) / denominator);
         rightFront.setPower ((y - x - rx) / denominator);
         rightBack.setPower ((y + x - rx) / denominator);
+
+
+
+        if (gamepad2.a) {
+            spinning.setPower(0.7);
+        }
+        else if (gamepad2.b) {
+            spinning.setPower(-0.7);
+        }
+        else {
+            spinning.setPower(0);
+        }
     }
 
     /*
