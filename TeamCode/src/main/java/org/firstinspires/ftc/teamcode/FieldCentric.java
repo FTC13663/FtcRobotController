@@ -62,7 +62,7 @@ public class FieldCentric extends OpMode
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
-    // private DcMotor spinning = null;
+    private DcMotor spinning = null;
     private BNO055IMU imu;
 
     /*/
@@ -77,14 +77,9 @@ public class FieldCentric extends OpMode
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        // spinning = hardwareMap.get(DcMotor.class, "spinning");
+        spinning = hardwareMap.get(DcMotor.class, "spinning");
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-
-        this.imu.initialize(parameters);
-
+        imu = CalibrateGyro.initializeGyro(hardwareMap, "imu", true, imu);
 
         // we have 4 motors to rotate each mecanum wheel
         leftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -99,7 +94,10 @@ public class FieldCentric extends OpMode
     @Override
     public void init_loop() {
         // gets data for robot orientation
-        telemetry.addData("imu heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        for (String s : CalibrateGyro.getCalibrationInfo(imu)){
+            telemetry.addLine(s);
+        }
+
     }
 
     @Override
@@ -123,8 +121,6 @@ public class FieldCentric extends OpMode
         x = y * sin + x * cos;
         y = temp;
 
-
-        
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         // this denominator scales the values outside of range [1,-1]
         leftFront.setPower ((y + x + rx) / denominator);
@@ -137,13 +133,13 @@ public class FieldCentric extends OpMode
         // the driver will use gamepad 1 to control spinning
         // because they're the ones who have to align it anyway
         // gamepad 1
-        /* if (gamepad1.a) {
+         if (gamepad1.a) {
              spinning.setPower(0.7);
         } else if (gamepad1.b) {
             spinning.setPower(-0.7);
         } else {
-            spinning.setPower(0)
-        } */
+            spinning.setPower(0);
+        }
     }
 
 

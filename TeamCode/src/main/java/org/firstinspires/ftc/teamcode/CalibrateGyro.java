@@ -17,7 +17,7 @@ public class CalibrateGyro {
 
     private static final String filename = "BNO055IMUCalibration.json";
 
-    public static void initializeGyro(HardwareMap hwMap, String configName, boolean readFromFile, BNO055IMU gyro) {
+    public static BNO055IMU initializeGyro(HardwareMap hwMap, String configName, boolean readFromFile, BNO055IMU gyro) {
         gyro = hwMap.get(BNO055IMU.class, configName);
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -36,8 +36,12 @@ public class CalibrateGyro {
 
         // If we aren't reading from a file, write new data to file
         if (!readFromFile) {
-          writeCalibrationDataToFile(gyro);
+            while (!gyro.isGyroCalibrated()) {
+                writeCalibrationDataToFile(gyro);
+            }
         }
+
+        return gyro;
     }
 
     private static void writeCalibrationDataToFile(BNO055IMU gyro) {

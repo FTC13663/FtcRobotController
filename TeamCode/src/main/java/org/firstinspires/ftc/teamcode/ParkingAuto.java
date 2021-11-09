@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -52,13 +53,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name="Parking", group="Iterative Opmode")
 // @Disabled
-public class ParkingAuto extends OpMode
-{
+public class ParkingAuto extends OpMode {
     // Declare OpMode members.
     private DcMotor leftFront = null;
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
+
+    private BNO055IMU imu;
 
     private int stage = 0;
     private ElapsedTime runtime = new ElapsedTime();
@@ -73,9 +75,9 @@ public class ParkingAuto extends OpMode
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftFront  = hardwareMap.get(DcMotor.class, "leftFront");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         leftBack = hardwareMap.get(DcMotor.class, "leftBack");
-        rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
 
         // we have 4 motors to rotate each mecanum wheel
@@ -98,9 +100,13 @@ public class ParkingAuto extends OpMode
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        CalibrateGyro.initializeGyro(hardwareMap, "imu", false, imu);
+
 
         // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        for (String s : CalibrateGyro.getCalibrationInfo(imu)) {
+            telemetry.addLine(s);
+        }
     }
 
     /*
@@ -115,24 +121,26 @@ public class ParkingAuto extends OpMode
      */
     @Override
     public void start() {
-        // if the motor is given a target number of tics, it goes that amount of tics
-        leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // Set targets for drivetrain
+        leftFront.setTargetPosition(distanceToTics(1000));
+        rightFront.setTargetPosition(distanceToTics(1000));
+        leftBack.setTargetPosition(distanceToTics(1000));
+        leftBack.setTargetPosition(distanceToTics(1000));
+
     }
+
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
     @Override
     public void loop() {
-        switch (stage){
+        switch (stage) {
             case 0:
-                // Set targets for drivetrain
-                leftFront.setTargetPosition(distanceToTics(1000));
-                rightFront.setTargetPosition(distanceToTics(1000));
-                leftBack.setTargetPosition(distanceToTics(1000));
-                leftBack.setTargetPosition(distanceToTics(1000));
+                // if the motor is given a target number of tics, it goes that amount of tics
+                leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 stage++;
                 break;
 
@@ -142,7 +150,7 @@ public class ParkingAuto extends OpMode
                 leftBack.setPower(0.5);
                 rightBack.setPower(0.5);
 
-                if (leftFront.getCurrentPosition() - distanceToTics(1000) <= 30){
+                if (leftFront.getCurrentPosition() - distanceToTics(1000) <= 30) {
                     leftFront.setPower(0);
                     rightFront.setPower(0);
                     leftBack.setPower(0);
@@ -165,7 +173,7 @@ public class ParkingAuto extends OpMode
                 rightFront.setPower(-0.5);
                 leftBack.setPower(-0.5);
                 rightBack.setPower(0.5);
-                if(runtime.time() > 1){
+                if (runtime.time() > 1) {
                     leftFront.setPower(0);
                     rightFront.setPower(0);
                     leftBack.setPower(0);
@@ -189,8 +197,6 @@ public class ParkingAuto extends OpMode
     }
 
     int distanceToTics(double x) {
-            return (int) ((x/301.59) * 572.6);
+        return (int) ((x / 301.59) * 572.6);
     }
-
-
 }

@@ -55,7 +55,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
          */
         @Override
         public void init() {
-            telemetry.addData("Status", "Initialized");
 
             // set up the motors
             leftFront  = hardwareMap.get(DcMotor.class, "leftFront");
@@ -86,7 +85,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
         @Override
         public void init_loop() {
             // gets data for robot orientation
-            //telemetry.addData("imu heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+            telemetry.addData("imu heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
         }
 
         @Override
@@ -124,6 +123,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
             leftFront.setPower(0);
             rightBack.setPower(0);
             leftBack.setPower(0);
+            spinning.setPower(0);
         }
 
 
