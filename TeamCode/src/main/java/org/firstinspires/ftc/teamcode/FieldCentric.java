@@ -63,7 +63,8 @@ public class FieldCentric extends OpMode
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
     private DcMotor spinning = null;
-    private BNO055IMU imu;
+    private CalibrateGyro cbgyro;
+    public BNO055IMU imu;
 
     /*/
      * Code to run ONCE when the driver hits INIT
@@ -79,13 +80,14 @@ public class FieldCentric extends OpMode
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         spinning = hardwareMap.get(DcMotor.class, "spinning");
 
-        imu = CalibrateGyro.initializeGyro(hardwareMap, "imu", true, imu);
-
         // we have 4 motors to rotate each mecanum wheel
         leftFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
+
+        cbgyro = new CalibrateGyro(true);
+        imu = cbgyro.initGyro(hardwareMap);
 
         // Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
@@ -94,10 +96,7 @@ public class FieldCentric extends OpMode
     @Override
     public void init_loop() {
         // gets data for robot orientation
-        for (String s : CalibrateGyro.getCalibrationInfo(imu)){
-            telemetry.addLine(s);
-        }
-
+        cbgyro.initLoopGyro(imu, telemetry);
     }
 
     @Override
@@ -123,10 +122,10 @@ public class FieldCentric extends OpMode
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         // this denominator scales the values outside of range [1,-1]
-        leftFront.setPower ((y + x + rx) / denominator);
-        leftBack.setPower ((y - x + rx) / denominator);
-        rightFront.setPower ((y - x - rx) / denominator);
-        rightBack.setPower ((y + x - rx) / denominator);
+        leftFront.setPower (0.75*((y + x + rx) / denominator));
+        leftBack.setPower (0.75*((y - x + rx) / denominator));
+        rightFront.setPower (0.75*((y - x - rx) / denominator));
+        rightBack.setPower (0.75*((y + x - rx) / denominator));
 
         telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 

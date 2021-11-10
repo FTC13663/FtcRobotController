@@ -3,61 +3,121 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ReadWriteFile;
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
+/**
+ * Class for calibrating BNO055IMU and writing calibration data to/from file. Make sure to declare
+ * and instantiate this as an instance field of your OpMode class, but only to call the methods in
+ * init and initLoop.
+ *
+ * PLACE THIS CLASS IN TEAMCODE FOLDER
+ *
+ * Ideally, this will allow you to run auton after full calibration and writing, then immediately
+ * enter teleop, get a quick calibration by retrieving data, and use field centric drive without
+ * adjusting the heading.
+ */
 public class CalibrateGyro {
 
-    private static final String filename = "BNO055IMUCalibration.json";
+    final static String FILENAME = "BNO055IMUCalibration.json";
 
-    public static BNO055IMU initializeGyro(HardwareMap hwMap, String configName, boolean readFromFile, BNO055IMU gyro) {
-        gyro = hwMap.get(BNO055IMU.class, configName);
+    private final boolean readFromFile;
+    private boolean writeComplete;
+
+    /**
+     * Construct a new CalibrateGyro object
+     *
+     * @param readFromFile true = read calibration data (teleop),
+     *                     false = generate calibration data (auton)
+     */
+    public CalibrateGyro(boolean readFromFile) {
+        this.readFromFile = readFromFile;
+        this.writeComplete = false;
+    }
+
+    /**
+     * Call this in init() as @code BNO055IMU imu = CalibrateGyro.initGyro(....);
+     * NOTE: Above is why there was null pointer problem in tuesday's code --- MAKE SURE TO SET EQUAL ^^^
+     *
+     *
+     * @param hwMap      OpMode HardwareMap instance
+     * @param configName OPTIONAL: name for configuration, by default "imu"
+     * @return An instance of your gyro, fully initialized (but not necessarily done calibrating!)
+     */
+    public BNO055IMU initGyro(HardwareMap hwMap, String configName) {
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        // Enable logging
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
 
         // If read calibration data from file, set param to filename
-        if (readFromFile) {
-          parameters.calibrationDataFile = filename;
+        if (this.readFromFile) {
+            parameters.calibrationDataFile = FILENAME;
         }
-        // Otherwise log calibration and do not read data from file
-        else {
-          parameters.calibrationDataFile = null;
-        }
-        // Initialize gyro with either data from file or new data
-        gyro.initialize(parameters);
 
-        // If we aren't reading from a file, write new data to file
-        if (!readFromFile) {
-            while (!gyro.isGyroCalibrated()) {
-                writeCalibrationDataToFile(gyro);
-            }
-        }
+        // Initialize gyro with either data from file or new data
+        BNO055IMU gyro = hwMap.get(BNO055IMU.class, configName);
+        gyro.initialize(parameters);
 
         return gyro;
     }
 
-    private static void writeCalibrationDataToFile(BNO055IMU gyro) {
-        BNO055IMU.CalibrationData calibrationData = gyro.readCalibrationData();
-        File file = AppUtil.getInstance().getSettingsFile(filename);
-        ReadWriteFile.writeFile(file, calibrationData.serialize());
+    // Helper so u can do less work -- uses default name for imu in config
+    public BNO055IMU initGyro(HardwareMap hwMap) {
+        return initGyro(hwMap, "imu");
     }
 
-    public static List<String> getCalibrationInfo(BNO055IMU gyro) {
+    /**
+     * CALL THIS IN initLoop() once per loop
+     *
+     * @param gyro      your gyro instance
+     * @param telemetry OpMode telemetry instance
+     */
+    public void initLoopGyro(BNO055IMU gyro, Telemetry telemetry) {
+
+        // If we don't want to read from file, the gyro is calibrated,
+        // and we have not already written to a file...
+        if (!this.readFromFile && gyro.isGyroCalibrated() && !this.writeComplete) {
+            // get calibration data from imu
+            BNO055IMU.CalibrationData calibrationData = gyro.readCalibrationData();
+
+            // write it to a json file
+            File file = AppUtil.getInstance().getSettingsFile(FILENAME);
+            ReadWriteFile.writeFile(file, calibrationData.serialize());
+
+            // state that writing is complete
+            this.writeComplete = true;
+        }
+
+        // output things about the gyro in telemetry
+        for (String s : getCalibrationInfo(gyro)) {
+            telemetry.addLine(s);
+        }
+
+        // output if the file write is complete -- ONLY PRESS START ON AUTON ONCE THIS SHOWS UP
+        if (this.writeComplete) {
+            telemetry.addLine("saved to " + FILENAME);
+        }
+
+        // update telemetry
+        telemetry.update();
+    }
+
+    private static List<String> getCalibrationInfo(BNO055IMU gyro) {
         List<String> telemetryData = new ArrayList<>();
-        telemetryData.add("Sensor: IMU Gyro --------");
+        telemetryData.add("Sensor: IMU Gyro -----------");
         telemetryData.add("Status: " + gyro.getSystemStatus().toShortString());
         telemetryData.add("Calib Status: " + gyro.getCalibrationStatus().toString());
         telemetryData.add("Gyro Calib? " + gyro.isGyroCalibrated());
-        telemetryData.add("heading: " + gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX,
-                AngleUnit.DEGREES).firstAngle);
+        telemetryData.add("heading: " + gyro.getAngularOrientation(
+                AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
         return telemetryData;
     }

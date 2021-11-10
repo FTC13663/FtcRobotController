@@ -59,7 +59,7 @@ public class ParkingAuto extends OpMode {
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
-
+    public CalibrateGyro cbgyro;
     private BNO055IMU imu;
 
     private int stage = 0;
@@ -100,13 +100,9 @@ public class ParkingAuto extends OpMode {
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        CalibrateGyro.initializeGyro(hardwareMap, "imu", false, imu);
+        cbgyro = new CalibrateGyro(false);
+        imu = cbgyro.initGyro(hardwareMap);
 
-
-        // Tell the driver that initialization is complete.
-        for (String s : CalibrateGyro.getCalibrationInfo(imu)) {
-            telemetry.addLine(s);
-        }
     }
 
     /*
@@ -114,6 +110,7 @@ public class ParkingAuto extends OpMode {
      */
     @Override
     public void init_loop() {
+        cbgyro.initLoopGyro(imu, telemetry);
     }
 
     /*
