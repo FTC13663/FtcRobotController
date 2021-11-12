@@ -64,7 +64,7 @@ public class FieldCentric extends OpMode
     private DcMotor rightBack = null;
     private DcMotor spinning = null;
     private CalibrateGyro cbgyro;
-    public BNO055IMU imu;
+    private BNO055IMU imu;
 
     /*/
      * Code to run ONCE when the driver hits INIT
@@ -86,7 +86,7 @@ public class FieldCentric extends OpMode
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
-        cbgyro = new CalibrateGyro(true);
+        cbgyro = new CalibrateGyro(false);
         imu = cbgyro.initGyro(hardwareMap);
 
         // Tell the driver that initialization is complete.
