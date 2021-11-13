@@ -86,7 +86,7 @@ public class FieldCentric extends OpMode
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
-        cbgyro = new CalibrateGyro(false);
+        cbgyro = new CalibrateGyro(true);
         imu = cbgyro.initGyro(hardwareMap);
 
         // Tell the driver that initialization is complete.

@@ -93,6 +93,12 @@ public class ParkingAuto extends OpMode {
         leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        // Set targets for drivetrain
+        leftFront.setTargetPosition(distanceToTics(4000));
+        rightFront.setTargetPosition(distanceToTics(4000));
+        leftBack.setTargetPosition(distanceToTics(4000));
+        rightBack.setTargetPosition(distanceToTics(4000));
+
         // motors remain in the same place at 0 power
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -111,6 +117,16 @@ public class ParkingAuto extends OpMode {
     @Override
     public void init_loop() {
         cbgyro.initLoopGyro(imu, telemetry);
+        telemetry.addData("BL Enc: ", this.leftBack.getCurrentPosition());
+        telemetry.addData("FL Enc: ", this.leftFront.getCurrentPosition());
+        telemetry.addData("BR Enc: ", this.rightBack.getCurrentPosition());
+        telemetry.addData("FR Enc: ", this.rightFront.getCurrentPosition());
+        telemetry.addData("BL Enc: ", this.leftBack.getTargetPosition());
+        telemetry.addData("FL Enc: ", this.leftFront.getTargetPosition());
+        telemetry.addData("BR Enc: ", this.rightBack.getTargetPosition());
+        telemetry.addData("FR Enc: ", this.rightFront.getTargetPosition());
+        telemetry.update();
+
     }
 
     /*
@@ -118,11 +134,6 @@ public class ParkingAuto extends OpMode {
      */
     @Override
     public void start() {
-        // Set targets for drivetrain
-        leftFront.setTargetPosition(distanceToTics(1000));
-        rightFront.setTargetPosition(distanceToTics(1000));
-        leftBack.setTargetPosition(distanceToTics(1000));
-        leftBack.setTargetPosition(distanceToTics(1000));
 
     }
 
@@ -131,14 +142,17 @@ public class ParkingAuto extends OpMode {
      */
     @Override
     public void loop() {
+
         switch (stage) {
             case 0:
+
                 // if the motor is given a target number of tics, it goes that amount of tics
                 leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                stage++;
+                stage = 1;
+                runtime.reset();
                 break;
 
             case 1:
@@ -147,38 +161,45 @@ public class ParkingAuto extends OpMode {
                 leftBack.setPower(0.5);
                 rightBack.setPower(0.5);
 
-                if (leftFront.getCurrentPosition() - distanceToTics(1000) <= 30) {
+                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
                     leftFront.setPower(0);
                     rightFront.setPower(0);
                     leftBack.setPower(0);
                     rightBack.setPower(0);
-                    stage++;
+                    stage = 2;
+                }
+                if (runtime.milliseconds() > 4000)
+                {
+                    stage = 2;
                 }
                 break;
 
-            case 2:
+            /*case 2:
                 leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                stage++;
                 runtime.reset();
-                break;
+                stage=3;
+                break;*/
 
-            case 3:
+            /*case 3:
                 leftFront.setPower(0.5);
                 rightFront.setPower(-0.5);
                 leftBack.setPower(-0.5);
                 rightBack.setPower(0.5);
-                if (runtime.time() > 1) {
+                if (runtime.milliseconds() > 1000) {
                     leftFront.setPower(0);
                     rightFront.setPower(0);
                     leftBack.setPower(0);
                     rightBack.setPower(0);
-                    stage++;
+                    stage=4;
                 }
-                break;
+                break;*/
         }
+
+        telemetry.addData("stage: ", stage);
+        telemetry.update();
     }
 
 

@@ -112,7 +112,7 @@ public class CalibrateGyro {
         }
 
         // update telemetry
-        telemetry.update();
+        //telemetry.update();
     }
 
     private static List<String> getCalibrationInfo(BNO055IMU gyro) {
