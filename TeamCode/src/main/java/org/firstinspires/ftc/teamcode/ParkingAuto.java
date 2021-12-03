@@ -32,7 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -55,14 +54,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // @Disabled
 public class ParkingAuto extends OpMode {
     // Declare OpMode members.
-    private DcMotor leftFront = null;
-    private DcMotor leftBack = null;
-    private DcMotor rightFront = null;
-    private DcMotor rightBack = null;
+    private DcMotor leftFront;
+    private DcMotor leftBack;
+    private DcMotor rightFront;
+    private DcMotor rightBack;
     public CalibrateGyro cbgyro;
     private BNO055IMU imu;
 
     private int stage = 0;
+    private int step = 10;
     private ElapsedTime runtime = new ElapsedTime();
 
     /*/
@@ -88,23 +88,10 @@ public class ParkingAuto extends OpMode {
 
         // resets the the encoders to 0 when init is pressed
 
-        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        // Set targets for drivetrain
-        leftFront.setTargetPosition(distanceToTics(4000));
-        rightFront.setTargetPosition(distanceToTics(4000));
-        leftBack.setTargetPosition(distanceToTics(4000));
-        rightBack.setTargetPosition(distanceToTics(4000));
-
+        // Set targets for drivetrain -- FIRST MOVEMENT
         // motors remain in the same place at 0 power
 
-        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         cbgyro = new CalibrateGyro(false);
         imu = cbgyro.initGyro(hardwareMap);
@@ -145,17 +132,31 @@ public class ParkingAuto extends OpMode {
 
         switch (stage) {
             case 0:
+                leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+                rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+                stage = step;
+                break;
+
+            case 1:
 
                 // if the motor is given a target number of tics, it goes that amount of tics
                 leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                stage = 1;
+                stage = 2;
                 runtime.reset();
                 break;
 
-            case 1:
+            case 2:
+                // forward
                 leftFront.setPower(0.5);
                 rightFront.setPower(0.5);
                 leftBack.setPower(0.5);
@@ -166,13 +167,24 @@ public class ParkingAuto extends OpMode {
                     rightFront.setPower(0);
                     leftBack.setPower(0);
                     rightBack.setPower(0);
-                    stage = 2;
+                    stage = step + 1;
                 }
                 if (runtime.milliseconds() > 4000)
                 {
-                    stage = 2;
+                    stage = step + 1;
                 }
                 break;
+
+            case 10:
+                moveForward(500);
+                stage = 0;
+                break;
+
+            case 11:
+                moveReverse(500);
+                stage = 0;
+                break;
+
 
             /*case 2:
                 leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -214,7 +226,35 @@ public class ParkingAuto extends OpMode {
         leftBack.setPower(0);
     }
 
-    int distanceToTics(double x) {
-        return (int) ((x / 301.59) * 572.6);
+    /*
+    Distance you want to travel in mm converted to motor ticks
+     */
+    int distanceToTicks(double x) {
+        return (int) ((x / 301.59) * 537.7);
     }
+
+    public void moveForward(double distance) {
+        int ticks = distanceToTicks(distance);
+        leftFront.setTargetPosition(ticks);
+        rightFront.setTargetPosition(ticks);
+        leftBack.setTargetPosition(ticks);
+        rightBack.setTargetPosition(ticks);
+    }
+
+    public void moveReverse(double distance) {
+        moveForward(distance * -1);
+    }
+
+    public void strafeRight(double distance) {
+        int ticks = distanceToTicks(distance);
+        leftFront.setTargetPosition(ticks);
+        leftBack.setTargetPosition(ticks * -1);
+        rightFront.setTargetPosition(ticks * -1);
+        rightBack.setTargetPosition(ticks);
+    }
+
+    public void strafeLeft(double distance) {
+        strafeRight(distance * -1);
+    }
+
 }
