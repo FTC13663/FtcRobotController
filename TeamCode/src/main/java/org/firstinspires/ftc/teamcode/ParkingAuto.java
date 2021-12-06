@@ -131,7 +131,7 @@ public class ParkingAuto extends OpMode {
     public void loop() {
 
         switch (stage) {
-            case 0:
+            case 0:// reset and initialization
                 leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -169,15 +169,14 @@ public class ParkingAuto extends OpMode {
                     rightBack.setPower(0);
                     stage = step + 1;
                 }
-                if (runtime.milliseconds() > 4000)
-                {
+                if (runtime.milliseconds() > 4000) {
                     stage = step + 1;
                 }
                 break;
 
             case 10:
                 moveForward(500);
-                stage = 0;
+                stage = 1;
                 break;
 
             case 11:
