@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@Autonomous(name="Parking", group="Iterative Opmode")
-public class BetterAuton extends OpMode {
+@Autonomous(name="Better Auton RED", group="Iterative Opmode")
+public class BetterAutonRed extends OpMode {
 
     private DcMotor leftFront;
     private DcMotor leftBack;
@@ -18,7 +18,6 @@ public class BetterAuton extends OpMode {
     private DcMotor spinning;
 
     private int stage = 0;
-    private int step = 10;
     private ElapsedTime runtime = new ElapsedTime();
 
 
@@ -86,19 +85,19 @@ public class BetterAuton extends OpMode {
                 break;
 
             case 1: // if the motor is given a target number of tics, it goes that amount of tics
-                strafeLeft(500);
+                strafeLeft(127);
                 runToPosition();
-                setMotorPower(0.5);
+                setMotorPower(0.2);
 
-                stage = step++;
+                stage++;
                 runtime.reset();
                 break;
 
             case 2:
-                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
+                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
                     runtime.reset();
-                    moveReverse(500);
+                    moveReverse(585);
                     stage++;
                 }
                 break;
@@ -108,9 +107,9 @@ public class BetterAuton extends OpMode {
                     runToPosition();
                 }
 
-                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
+                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
-                    moveForward(500);
+                    strafeLeft(700);
 
                     stage++;
                 }
@@ -118,7 +117,7 @@ public class BetterAuton extends OpMode {
 
             case 4: //run duck spinner
                 if (runtime.milliseconds()<3500) {
-                    spinning.setPower(0.7);
+                    spinning.setPower(-0.7);
                 }
                 else {
                     spinning.setPower(0);
@@ -132,9 +131,9 @@ public class BetterAuton extends OpMode {
                     runToPosition();
                 }
 
-                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
+                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
-                    strafeRight(500);
+                    moveReverse(200);
                     stage++;
                 }
                 break;
@@ -144,23 +143,12 @@ public class BetterAuton extends OpMode {
                     runToPosition();
                 }
 
-                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
-                    resetEncoders();
-                    moveForward(500);
-                    stage++;
-                }
-                break;
-
-            case 7:
-                if (runtime.milliseconds() > 500) {
-                    runToPosition();
-                }
-
-                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 100) {
+                if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
                     stage++;
                 }
                 break;
+
         }
 
         telemetry.addData("STAGE ", stage);
