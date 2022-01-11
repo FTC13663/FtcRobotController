@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -65,6 +66,8 @@ public class FieldCentric extends OpMode
     private DcMotor spinning = null;
     private CalibrateGyro cbgyro;
     private BNO055IMU imu;
+    private DcMotor lift = null;
+    private CRServo intake = null;
 
     /*/
      * Code to run ONCE when the driver hits INIT
@@ -79,6 +82,8 @@ public class FieldCentric extends OpMode
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         spinning = hardwareMap.get(DcMotor.class, "spinning");
+        lift = hardwareMap.get(DcMotor.class, "lift");
+        intake = hardwareMap.get(CRServo.class, "intake");
 
         // we have 4 motors to rotate each mecanum wheel
         leftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -138,6 +143,16 @@ public class FieldCentric extends OpMode
             spinning.setPower(-0.7);
         } else {
             spinning.setPower(0);
+        }
+
+        lift.setPower(-1 * gamepad2.right_stick_y);
+
+        if (gamepad2.right_trigger > 0.1) {
+            intake.setPower(1);
+        } else if (gamepad2.left_trigger > 0.1) {
+            intake.setPower(-1);
+        } else {
+            intake.setPower(0);
         }
     }
 
