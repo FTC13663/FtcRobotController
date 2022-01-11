@@ -85,7 +85,7 @@ public class BetterAutonBlue extends OpMode {
                 break;
 
             case 1: // if the motor is given a target number of tics, it goes that amount of tics
-                strafeRight(107);
+                strafeRight(55);
                 runToPosition();
                 setMotorPower(0.2);
 
@@ -97,7 +97,7 @@ public class BetterAutonBlue extends OpMode {
                 if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
                     runtime.reset();
-                    moveReverse(585);
+                    moveReverse(586);
                     stage++;
                 }
                 break;
@@ -117,7 +117,7 @@ public class BetterAutonBlue extends OpMode {
 
             case 4: //run duck spinner
                 if (runtime.milliseconds()<3500) {
-                    spinning.setPower(-0.7);
+                    spinning.setPower(0.7);
                 }
                 else {
                     spinning.setPower(0);

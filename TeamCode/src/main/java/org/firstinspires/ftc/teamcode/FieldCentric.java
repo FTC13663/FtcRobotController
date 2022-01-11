@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -65,6 +66,8 @@ public class FieldCentric extends OpMode
     private DcMotor spinning = null;
     private CalibrateGyro cbgyro;
     private BNO055IMU imu;
+    private DcMotor lift = null;
+    private CRServo intake = null;
 
     /*/
      * Code to run ONCE when the driver hits INIT
@@ -79,6 +82,23 @@ public class FieldCentric extends OpMode
         rightFront  = hardwareMap.get(DcMotor.class, "rightFront");
         rightBack = hardwareMap.get(DcMotor.class, "rightBack");
         spinning = hardwareMap.get(DcMotor.class, "spinning");
+        lift = hardwareMap.get(DcMotor.class, "lift");
+        intake = hardwareMap.get(CRServo.class, "intake");
+
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        spinning.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        lift.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        spinning.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // we have 4 motors to rotate each mecanum wheel
         leftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -100,7 +120,14 @@ public class FieldCentric extends OpMode
     }
 
     @Override
-    public void start() { }
+    public void start() {
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        spinning.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 
     @Override
     public void loop() {
@@ -127,7 +154,6 @@ public class FieldCentric extends OpMode
         rightFront.setPower (0.75*((y - x - rx) / denominator));
         rightBack.setPower (0.75*((y + x - rx) / denominator));
 
-        telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
 
         // the driver will use gamepad 1 to control spinning
         // because they're the ones who have to align it anyway
@@ -139,6 +165,19 @@ public class FieldCentric extends OpMode
         } else {
             spinning.setPower(0);
         }
+
+        lift.setPower(-0.5 * gamepad2.right_stick_y);
+
+        intake.setPower(-1 * gamepad2.left_stick_y);
+
+        telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
+        telemetry.addData("LIFT ", lift.getCurrentPosition());
+        telemetry.addData("FL", leftFront.getCurrentPosition());
+        telemetry.addData("BL", leftBack.getCurrentPosition());
+        telemetry.addData("FR", leftFront.getCurrentPosition());
+        telemetry.addData("BR", rightBack.getCurrentPosition());
+
+        telemetry.update();
     }
 
 
