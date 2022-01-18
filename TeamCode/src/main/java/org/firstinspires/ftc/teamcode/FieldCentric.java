@@ -166,17 +166,16 @@ public class FieldCentric extends OpMode
             spinning.setPower(0);
         }
 
-        lift.setPower(-0.5 * gamepad2.right_stick_y);
+        lift.setPower(-0.3 * gamepad2.right_stick_y);
 
         intake.setPower(-1 * gamepad2.left_stick_y);
 
         telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
-        telemetry.addData("LIFT ", lift.getCurrentPosition());
-        telemetry.addData("FL", leftFront.getCurrentPosition());
-        telemetry.addData("BL", leftBack.getCurrentPosition());
-        telemetry.addData("FR", leftFront.getCurrentPosition());
-        telemetry.addData("BR", rightBack.getCurrentPosition());
-
+        //telemetry.addData("LIFT ", lift.getCurrentPosition());
+        //telemetry.addData("FL", leftFront.getCurrentPosition());
+        //telemetry.addData("BL", leftBack.getCurrentPosition());
+        //telemetry.addData("FR", leftFront.getCurrentPosition());
+        //telemetry.addData("BR", rightBack.getCurrentPosition());
         telemetry.update();
     }
 
