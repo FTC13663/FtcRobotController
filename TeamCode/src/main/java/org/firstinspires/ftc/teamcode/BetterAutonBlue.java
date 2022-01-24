@@ -97,7 +97,7 @@ public class BetterAutonBlue extends OpMode {
                 if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
                     runtime.reset();
-                    moveReverse(586);
+                    moveReverse(490);
                     stage++;
                 }
                 break;
