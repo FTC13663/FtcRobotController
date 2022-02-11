@@ -149,10 +149,14 @@ public class FieldCentric extends OpMode
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         // this denominator scales the values outside of range [1,-1]
-        leftFront.setPower (0.75*((y + x + rx) / denominator));
-        leftBack.setPower (0.75*((y - x + rx) / denominator));
-        rightFront.setPower (0.75*((y - x - rx) / denominator));
-        rightBack.setPower (0.75*((y + x - rx) / denominator));
+        double speedFactor = 1.00;
+        if (gamepad1.right_trigger > 0.2) {
+            speedFactor = 0.50;
+        }
+        leftFront.setPower (speedFactor * 0.75* ((y + x + rx) / denominator));
+        leftBack.setPower (speedFactor * 0.75*((y - x + rx) / denominator));
+        rightFront.setPower (speedFactor * 0.75*((y - x - rx) / denominator));
+        rightBack.setPower (speedFactor * 0.75*((y + x - rx) / denominator));
 
 
         // the driver will use gamepad 1 to control spinning
@@ -160,11 +164,12 @@ public class FieldCentric extends OpMode
         // gamepad 1
          if (gamepad1.a) {
              spinning.setPower(0.7);
-        } else if (gamepad1.b) {
+         } else if (gamepad1.b) {
             spinning.setPower(-0.7);
-        } else {
+         }
+         else {
             spinning.setPower(0);
-        }
+         }
 
         lift.setPower(-0.3 * gamepad2.right_stick_y);
 

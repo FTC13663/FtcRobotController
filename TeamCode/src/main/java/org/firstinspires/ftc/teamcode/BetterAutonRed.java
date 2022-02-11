@@ -85,7 +85,7 @@ public class BetterAutonRed extends OpMode {
                 break;
 
             case 1: // if the motor is given a target number of tics, it goes that amount of tics
-                strafeLeft(40);
+                moveForward(85);
                 runToPosition();
                 setMotorPower(0.2);
 
@@ -97,7 +97,7 @@ public class BetterAutonRed extends OpMode {
                 if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
                     runtime.reset();
-                    moveReverse(585);
+                    strafeLeft(780);
                     stage++;
                 }
                 break;
@@ -109,7 +109,7 @@ public class BetterAutonRed extends OpMode {
 
                 if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
-                    strafeLeft(800);
+                    strafeLeft(0);
 
                     stage++;
                 }
@@ -133,7 +133,7 @@ public class BetterAutonRed extends OpMode {
 
                 if (Math.abs(leftFront.getCurrentPosition() - leftFront.getTargetPosition()) <= 20) {
                     resetEncoders();
-                    moveReverse(200);
+                    moveForward(570);
                     stage++;
                 }
                 break;
