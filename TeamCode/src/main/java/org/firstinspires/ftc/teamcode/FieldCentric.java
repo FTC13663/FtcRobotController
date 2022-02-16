@@ -150,21 +150,14 @@ public class FieldCentric extends OpMode
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
         // this denominator scales the values outside of range [1,-1]
         double speedFactor = 1.00;
-
-
-
-
         if (gamepad1.right_trigger > 0.2) {
-            leftFront.setPower (speedFactor/2 * 0.75* ((y + x + rx) / denominator));
-            leftBack.setPower (speedFactor/2 * 0.75*((y - x + rx) / denominator));
-            rightFront.setPower (speedFactor/2 * 0.75*((y - x - rx) / denominator));
-            rightBack.setPower (speedFactor/2 * 0.75*((y + x - rx) / denominator));
-        } else {
-            leftFront.setPower (speedFactor * 0.75* ((y + x + rx) / denominator));
-            leftBack.setPower (speedFactor * 0.75*((y - x + rx) / denominator));
-            rightFront.setPower (speedFactor * 0.75*((y - x - rx) / denominator));
-            rightBack.setPower (speedFactor * 0.75*((y + x - rx) / denominator));
+            speedFactor = 0.50;
         }
+        leftFront.setPower (speedFactor * ((y + x + rx) / denominator));
+        leftBack.setPower (speedFactor * ((y - x + rx) / denominator));
+        rightFront.setPower (speedFactor * ((y - x - rx) / denominator));
+        rightBack.setPower (speedFactor * ((y + x - rx) / denominator));
+
 
         // the driver will use gamepad 1 to control spinning
         // because they're the ones who have to align it anyway
@@ -183,11 +176,11 @@ public class FieldCentric extends OpMode
         intake.setPower(-1 * gamepad2.left_stick_y);
 
         telemetry.addData("heading: ", imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle);
-        //telemetry.addData("LIFT ", lift.getCurrentPosition());
-        //telemetry.addData("FL", leftFront.getCurrentPosition());
-        //telemetry.addData("BL", leftBack.getCurrentPosition());
-        //telemetry.addData("FR", leftFront.getCurrentPosition());
-        //telemetry.addData("BR", rightBack.getCurrentPosition());
+        telemetry.addData("LIFT ", lift.getCurrentPosition());
+        telemetry.addData("FL", leftFront.getCurrentPosition());
+        telemetry.addData("BL", leftBack.getCurrentPosition());
+        telemetry.addData("FR", leftFront.getCurrentPosition());
+        telemetry.addData("BR", rightBack.getCurrentPosition());
         telemetry.update();
     }
 
